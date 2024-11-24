@@ -9,10 +9,49 @@
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     grid-template-rows: repeat(3, 1fr);
+    gap: .1em;
+    background-color: black;
 
 }
-
 .field {
-    background: aqua;
-    border: 1px solid red;
+    background: white;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.circle {
+    width: 80%;
+    height: 80%;
+    border-radius: 50%;
+    border: 2px solid black;
+}
+
+.x-mark {
+    position: relative;
+    display: block;
+    width: 80%;
+    height: 80%;
+}
+
+.x-mark::before,
+.x-mark::after {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 3%;
+    background-color: #151515;
+    top: 50%;
+    left: 0;
+    transform-origin: center;
+}
+
+.x-mark::before {
+    transform: rotate(45deg);
+}
+
+.x-mark::after {
+    transform: rotate(-45deg);
 }
