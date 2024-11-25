@@ -13,19 +13,25 @@
 
     let player = 'circle';
     document.addEventListener('DOMContentLoaded', () => {
-        startGame();
+        startMultiFieldGame();
     });
 
-    const startGame = () => {
+    const startMultiFieldGame = () => {
         let root = getElementById('root');
-        createBoard('main', root, 'outer-board-container');
+        createBoard('main', root, 'outer-board-container', false);
         let fields = Array.from(getElementById('board-container-main').children);
         for (let i = 0; i < fields.length; i++) {
-            createBoard(i, fields[i], 'inner-board-container');
+            createBoard(i, fields[i], 'inner-board-container', true);
         }
     }
 
-    const createBoard = (boardId, root, containerClass) => {
+    const startSingleGame = () => {
+        let root = getElementById('root');
+        createBoard('main', root, 'outer-board-container', true);
+
+    };
+
+    const createBoard = (boardId, root, containerClass, isSingleGame) => {
         const boardContainer = document.createElement('div');
         boardContainer.id = 'board-container' + '-' + boardId;
         boardContainer.classList.add(containerClass, 'board-container');
@@ -37,7 +43,7 @@
                 columnNumber = 0;
             }
             let element = document.createElement('div');
-            if (containerClass.includes('inner')) {
+            if (isSingleGame) {
                 element.addEventListener('click', onFieldClick);
             }
             element.id = i + "-" + boardId;
