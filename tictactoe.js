@@ -17,14 +17,18 @@
     });
 
     const startGame = () => {
-        createBoard('single')
+        let root = getElementById('root');
+        createBoard('main', root, 'outer-board-container');
+        let fields = Array.from(getElementById('board-container-main').children);
+        for (let i = 0; i < fields.length; i++) {
+            createBoard(i, fields[i], 'inner-board-container');
+        }
     }
 
-    const createBoard = (boardId) => {
-        const root = getElementById('root');
+    const createBoard = (boardId, root, containerClass) => {
         const boardContainer = document.createElement('div');
         boardContainer.id = 'board-container' + '-' + boardId;
-        boardContainer.classList.add('board-container');
+        boardContainer.classList.add(containerClass, 'board-container');
         let rowNumber = 0;
         let columnNumber = 0;
         for (let i = 0; i < 9; i++) {
@@ -33,7 +37,9 @@
                 columnNumber = 0;
             }
             let element = document.createElement('div');
-            element.addEventListener('click', onFieldClick);
+            if (containerClass.includes('inner')) {
+                element.addEventListener('click', onFieldClick);
+            }
             element.id = i + "-" + boardId;
             element.classList.add('field', 'row' + rowNumber, 'column' + columnNumber);
             boardContainer.append(element);

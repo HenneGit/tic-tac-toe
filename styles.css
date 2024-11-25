@@ -3,16 +3,28 @@
 
 }
 
+
+.outer-board-container {
+    width: clamp(500px, 60vh, 1500px);
+    height: clamp(500px, 60vh, 1500px);
+}
+
 .board-container {
-    width: 60vh;
-    height: 60vh;
+
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     grid-template-rows: repeat(3, 1fr);
-    gap: .1em;
+    gap: 1px;
     background-color: black;
-
 }
+
+.inner-board-container {
+    background-color: lightgrey;
+    margin: 5%;
+    width: clamp(50px, 90%, 500px);
+    height: clamp(50px, 90%, 500px);
+}
+
 .field {
     background: white;
     position: relative;
