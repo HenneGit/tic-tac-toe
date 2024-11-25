@@ -82,24 +82,22 @@
 
     const checkDiagonal = (id, board) => {
         let fieldNumber = getFieldNumber(id);
+        let isPlayerWinning = false;
         if (fieldNumber === '0' || fieldNumber === '8') {
             const leftToRightDiagonal = getLeftToRightDiagonal(board);
-            if (isWinning(leftToRightDiagonal)) {
-                playerWon();
-            }
+            isPlayerWinning = fieldsContainWinning(leftToRightDiagonal);
         }
         if (fieldNumber === '2' || fieldNumber === '6') {
             const rightToLeftDiagonal = getRightToLeftDiagonal(board);
-            if (isWinning(rightToLeftDiagonal)) {
-                playerWon();
-            }
+            isPlayerWinning = fieldsContainWinning(rightToLeftDiagonal);
         }
         if (fieldNumber === '4') {
             const rightToLeftDiagonal = getRightToLeftDiagonal(board);
             const leftToRightDiagonal = getLeftToRightDiagonal(board);
-            if (isWinning(leftToRightDiagonal) || isWinning(rightToLeftDiagonal)) {
-                playerWon();
-            }
+            isPlayerWinning = fieldsContainWinning(leftToRightDiagonal) || fieldsContainWinning(rightToLeftDiagonal);
+        }
+        if (isPlayerWinning) {
+            playerWon();
         }
     }
 
@@ -126,12 +124,12 @@
     const checkRow = (id, board) => {
         const rowNumber = fieldLookUp.get(getFieldNumber(id))[0];
         const fields = board.querySelectorAll('.row' + rowNumber);
-        if (isWinning(fields)) {
+        if (fieldsContainWinning(fields)) {
             playerWon();
         }
     };
 
-    const isWinning = (fields) => {
+    const fieldsContainWinning = (fields) => {
         return Array.from(fields).filter(field =>
             field.querySelector('.' + player) !== null
         ).length === 3;
@@ -140,7 +138,7 @@
     const checkColumn = (id, board) => {
         let columnNumber = fieldLookUp.get(getFieldNumber(id))[1];
         const fields = board.querySelectorAll('.column' + columnNumber);
-        if (isWinning(fields)) {
+        if (fieldsContainWinning(fields)) {
             playerWon();
         }
     };
