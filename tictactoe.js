@@ -16,7 +16,6 @@
         startGame();
     });
 
-
     const startGame = () => {
         createBoard('single')
     }
@@ -60,7 +59,6 @@
         checkWinningCondition(id);
     }
 
-
     const checkWinningCondition = (id) => {
         let currentField = getElementById(id);
         checkRow(id, currentField.parentElement);
@@ -93,7 +91,6 @@
         }
     }
 
-
     const playerWon = () => {
         alert(player + " won");
     }
@@ -116,7 +113,7 @@
 
     const checkRow = (id, board) => {
         const rowNumber = fieldLookUp.get(getFieldNumber(id))[0];
-        const fields = board.querySelectorAll('.row'  + rowNumber);
+        const fields = board.querySelectorAll('.row' + rowNumber);
         if (isWinning(fields)) {
             playerWon();
         }
@@ -130,13 +127,11 @@
 
     const checkColumn = (id, board) => {
         let columnNumber = fieldLookUp.get(getFieldNumber(id))[1];
-        const fields = board.querySelectorAll('.column'  + columnNumber);
-        const fieldsOfPlayer = isWinning(fields);
+        const fields = board.querySelectorAll('.column' + columnNumber);
         if (isWinning(fields)) {
             playerWon();
         }
     };
-
 
     const getElementById = (id) => {
         return document.getElementById(id)
