@@ -93,9 +93,9 @@
         field.removeEventListener('mouseenter', onFieldHover);
         field.removeEventListener('mouseleave', removeIcon);
         appendIcon(field, false);
-        player = player === 'circle' ? 'x-mark' : 'circle';
         console.log(id);
         checkWinningCondition(id);
+        player = player === 'circle' ? 'x-mark' : 'circle';
     }
 
     const checkWinningCondition = (id) => {
@@ -106,11 +106,6 @@
             checkDiagonal(id, currentField.parentElement);
         }
     };
-
-    const getAllField = () => {
-
-    }
-
 
     const checkDiagonal = (id, board) => {
         let fieldNumber = getFieldNumber(id);
@@ -154,8 +149,10 @@
     };
 
     const checkRow = (id, board) => {
+        console.log(id)
         const rowNumber = fieldLookUp.get(getFieldNumber(id))[0];
         const fields = board.querySelectorAll('.row' + rowNumber);
+        console.log(fields);
         if (fieldsContainWinning(fields)) {
             playerWon();
         }
@@ -170,6 +167,7 @@
     const checkColumn = (id, board) => {
         let columnNumber = fieldLookUp.get(getFieldNumber(id))[1];
         const fields = board.querySelectorAll('.column' + columnNumber);
+        console.log(fields);
         if (fieldsContainWinning(fields)) {
             playerWon();
         }
