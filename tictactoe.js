@@ -176,9 +176,11 @@
         field.removeEventListener('mouseenter', onFieldHover);
         field.removeEventListener('mouseleave', removeIcon);
         appendIcon(field, false);
+
         checkWinningCondition(id, false);
         switchPlayer();
     }
+
 
     const unlockBoard = () => {
         let board = lockedBoards.shift();
@@ -210,9 +212,30 @@
         if (getFieldNumber(id) % 2 === 0) {
             if (checkDiagonal(id, currentField.parentElement)) {
                 boardWon(currentField.parentElement, isOuterBoard);
+                return;
             }
         }
+        checkDrawCondition(currentField.parentElement, isOuterBoard);
+
     };
+
+    const checkDrawCondition = (board, isOuterBoard) => {
+        let elementsWithChildren = Array.from(board.children).filter(field => field.children.length === 0);
+        console.log(elementsWithChildren);
+        if (elementsWithChildren.length === 0 && !isOuterBoard) {
+            console.log("draw");
+            board.classList.add('board-won')
+            return;
+        }
+        if (isOuterBoard) {
+            let board = getElementById('board-container-main');
+            let elementsWithChildren = Array.from(board.children).filter(field => field.children.length !== 2);
+            console.log(elementsWithChildren);
+            if (elementsWithChildren.length === 0) {
+                board.classList.add('board-won');
+            }
+        }
+    }
 
     const checkDiagonal = (id, board) => {
         let fieldNumber = getFieldNumber(id);
