@@ -17,12 +17,12 @@
     });
 
     const lockedBoards = [];
+    let trapFields = [];
     let gameMode = "multi";
 
     const setUp = () => {
         let singleLink = getElementById('game-mode-single');
         singleLink.addEventListener('click', () => {
-            console.log("single");
             gameMode = 'single';
             startSingleGame();
         })
@@ -41,6 +41,7 @@
 
     const startMultiFieldGame = () => {
         let root = getElementById('root');
+        trapFields = []
         clearBoard(root);
         createBoard('main', root, 'outer-board-container', false);
         let fields = Array.from(getElementById('board-container-main').children);
@@ -64,18 +65,18 @@
     const addEventFields = () => {
         let fields = getElementById('board-container-main').children;
         let numberOfFields = 8;
-        for (let i = 0; i < fields.length; i++) {
+        for (let boardNumber = 0; boardNumber < fields.length; boardNumber++) {
             if (numberOfFields > 0) {
-                const subBoard = fields[i];
+                const subBoard = fields[boardNumber];
                 let fieldChildren = subBoard.children;
                 let number = Math.floor(Math.random() * 3);
                 for (let j = 0; j < number; j++) {
                     let fieldNumber = Math.floor(Math.random() * 9);
-                    let child = Array.from(fieldChildren[0].children);
-                    let element = child[fieldNumber];
-                    element.classList.add('hint');
-                    element.removeEventListener('click', onFieldClick);
-                    element.addEventListener('click', onTrapFieldClick);
+                    trapFields.push(fieldNumber + '-' + boardNumber);
+                    let fields = Array.from(fieldChildren[0].children);
+                    let field = fields[fieldNumber];
+                    field.removeEventListener('click', onFieldClick);
+                    field.addEventListener('click', onTrapFieldClick);
                 }
                 numberOfFields = numberOfFields - number;
             }
@@ -87,20 +88,27 @@
         if (id === '') {
             id = event.target.parentElement.id;
         }
+        let index = trapFields.indexOf(id);
+        if (index !== -1) {
+            trapFields.splice(index, 1);
+        }
         let elementById = getElementById(id);
         elementById.classList.add('trap-field');
         let board = elementById.parentElement;
         lockedBoards.push(board);
         let fieldsOfBoard = Array.from(board.children);
         for (const field of fieldsOfBoard) {
+
             field.classList.add('deactivated');
+            //remove hover effect icon
             if (field.firstChild && field.firstChild.nodeType === Node.ELEMENT_NODE) {
                 if (field.firstChild.classList.contains(player + '-hover')) {
                     field.removeChild(field.firstChild);
                 }
             }
             const clone = field.cloneNode(true);
-                      field.parentNode.replaceChild(clone, field);
+            clone.id = field.id;
+            field.parentNode.replaceChild(clone, field);
         }
         switchPlayer();
     };
@@ -177,8 +185,12 @@
         if (board) {
             const children = Array.from(board.children);
             for (const field of children) {
+                if (trapFields.includes(field.id)) {
+                    field.addEventListener('click', onTrapFieldClick);
+                } else if (!field.firstChild) {
+                    field.addEventListener('click', onFieldClick);
+                }
                 attachMouseOverEvents(field);
-                field.addEventListener('click', onFieldClick);
                 field.classList.remove('deactivated');
             }
         }
@@ -187,20 +199,16 @@
 
     const checkWinningCondition = (id, isOuterBoard) => {
         let currentField = getElementById(id);
-        console.log(currentField);
         if (checkRow(id, currentField.parentElement)) {
-            console.log("row won");
             boardWon(currentField.parentElement, isOuterBoard);
             return;
         }
         if (checkColumn(id, currentField.parentElement)) {
-            console.log("column won");
             boardWon(currentField.parentElement, isOuterBoard);
             return;
         }
         if (getFieldNumber(id) % 2 === 0) {
             if (checkDiagonal(id, currentField.parentElement)) {
-                console.log("diagonal won");
                 boardWon(currentField.parentElement, isOuterBoard);
             }
         }
@@ -211,39 +219,26 @@
         let isPlayerWinning = false;
         if (fieldNumber === '0' || fieldNumber === '8') {
             const leftToRightDiagonal = getLeftToRightDiagonal(board);
-            console.log(leftToRightDiagonal);
             isPlayerWinning = fieldsContainWinning(leftToRightDiagonal);
-            if (isPlayerWinning) {
-                console.log("leftToRightDiagonal won");
-            }
         }
         if (fieldNumber === '2' || fieldNumber === '6') {
             const rightToLeftDiagonal = getRightToLeftDiagonal(board);
             isPlayerWinning = fieldsContainWinning(rightToLeftDiagonal);
-            if (isPlayerWinning) {
-                console.log("leftToRightDiagonal won");
-            }
         }
         if (fieldNumber === '4') {
             const rightToLeftDiagonal = getRightToLeftDiagonal(board);
             const leftToRightDiagonal = getLeftToRightDiagonal(board);
             isPlayerWinning = fieldsContainWinning(leftToRightDiagonal) || fieldsContainWinning(rightToLeftDiagonal);
-            if (isPlayerWinning) {
-                console.log("mid diagonal won");
-            }
         }
         return isPlayerWinning;
     }
 
     const boardWon = (board, isOuterBoard) => {
-        console.log(isOuterBoard ? 'isOuterBoard' : 'isInnerBoard');
-        console.log(board);
         const icon = document.createElement('span');
         board.classList.add('board-won')
         icon.classList.add(player);
         board.parentElement.append(icon);
         if (gameMode === 'multi' && !isOuterBoard) {
-            console.log(board.parentElement.id);
             checkWinningCondition(board.parentElement.id, true);
         }
     }
@@ -267,14 +262,12 @@
     const checkRow = (id, board) => {
         const rowNumber = fieldLookUp.get(getFieldNumber(id))[0];
         const fields = board.querySelectorAll(':scope > .row' + rowNumber);
-        console.log(fields);
         return fieldsContainWinning(fields);
     };
 
     const checkColumn = (id, board) => {
         let columnNumber = fieldLookUp.get(getFieldNumber(id))[1];
         const fields = board.querySelectorAll(':scope > .column' + columnNumber);
-        console.log(fields);
         return fieldsContainWinning(fields);
     };
 
@@ -284,7 +277,6 @@
                 return field.querySelectorAll(':scope > .' + player).length === 1
             }
         );
-        console.log(filter);
         return filter.length === 3;
     };
 

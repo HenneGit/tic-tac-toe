@@ -124,9 +124,4 @@ body {
 }
 
 .deactivated {
-    background: lightgrey;
-}
-
-.hint {
-    background: aqua;
-}
+    box-shadow: 0px 9px 30px rgba(245, 65, 25, 0.3);}
