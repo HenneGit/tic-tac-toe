@@ -43,10 +43,11 @@
                 columnNumber = 0;
             }
             let element = document.createElement('div');
+            element.id = i + "-" + boardId;
             if (isSingleGame) {
+                attachMouseOverEvents(element);
                 element.addEventListener('click', onFieldClick);
             }
-            element.id = i + "-" + boardId;
             element.classList.add('field', 'row' + rowNumber, 'column' + columnNumber);
             boardContainer.append(element);
             columnNumber++;
@@ -54,13 +55,22 @@
         root.append(boardContainer)
     };
 
-    const onFieldClick = (event) => {
-        player = player === 'circle' ? 'x-mark' : 'circle';
-        let id = event.target.id;
-        let field = getElementById(id);
+
+    const attachMouseOverEvents = (field) => {
         if (field.children.length > 0) {
             return;
         }
+
+        field.addEventListener('mouseenter',onFieldHover);
+        field.addEventListener('mouseleave',removeIcon);
+
+    }
+
+    const onFieldHover = (event) => {
+        appendIcon(event.target);
+    }
+
+    const appendIcon = (field) => {
         const icon = document.createElement('span');
         if (player === "circle") {
             icon.className = 'icon circle';
@@ -68,6 +78,27 @@
             icon.className = 'icon x-mark';
         }
         field.append(icon);
+
+    };
+
+    const removeIcon = (event) => {
+        if (event.target.firstChild) {
+            event.target.removeChild(event.target.firstChild);
+        }
+    };
+
+    const onFieldClick = (event) => {
+        let id = event.target.id;
+        if (id === "") {
+            id = event.target.parentElement.id;
+        }
+        let field = getElementById(id);
+        field.removeChild(field.firstChild);
+        field.removeEventListener('mouseenter', onFieldHover);
+        field.removeEventListener('mouseleave', removeIcon);
+        appendIcon(field);
+        player = player === 'circle' ? 'x-mark' : 'circle';
+        console.log(id);
         checkWinningCondition(id);
     }
 
@@ -79,6 +110,11 @@
             checkDiagonal(id, currentField.parentElement);
         }
     };
+
+    const getAllField = () => {
+
+    }
+
 
     const checkDiagonal = (id, board) => {
         let fieldNumber = getFieldNumber(id);
