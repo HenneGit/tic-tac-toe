@@ -61,22 +61,18 @@
             return;
         }
 
-        field.addEventListener('mouseenter',onFieldHover);
-        field.addEventListener('mouseleave',removeIcon);
+        field.addEventListener('mouseenter', onFieldHover);
+        field.addEventListener('mouseleave', removeIcon);
 
     }
 
     const onFieldHover = (event) => {
-        appendIcon(event.target);
+        appendIcon(event.target, true);
     }
 
-    const appendIcon = (field) => {
+    const appendIcon = (field, isHover) => {
         const icon = document.createElement('span');
-        if (player === "circle") {
-            icon.className = 'icon circle';
-        } else {
-            icon.className = 'icon x-mark';
-        }
+        isHover ? icon.classList.add('icon', player + '-hover'): icon.classList.add('icon', player) ;
         field.append(icon);
 
     };
@@ -96,7 +92,7 @@
         field.removeChild(field.firstChild);
         field.removeEventListener('mouseenter', onFieldHover);
         field.removeEventListener('mouseleave', removeIcon);
-        appendIcon(field);
+        appendIcon(field, false);
         player = player === 'circle' ? 'x-mark' : 'circle';
         console.log(id);
         checkWinningCondition(id);

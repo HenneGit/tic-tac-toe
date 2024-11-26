@@ -45,14 +45,24 @@
     box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.2);
 }
 
-.circle {
+
+
+.circle{
     width: 80%;
     height: 80%;
     border-radius: 50%;
     border: 2px solid black;
 }
 
-.x-mark {
+
+.circle-hover {
+    width: 80%;
+    height: 80%;
+    border-radius: 50%;
+    border: 2px solid #DED9D9FF;
+}
+
+.x-mark, .x-mark-hover {
     position: relative;
     display: block;
     width: 80%;
@@ -70,11 +80,27 @@
     left: 0;
     transform-origin: center;
 }
+.x-mark-hover::before,
+.x-mark-hover::after {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 3%;
+    background-color: #DED9D9FF;
+    top: 50%;
+    left: 0;
+    transform-origin: center;
+}
 
+.x-mark-hover::before {
+    transform: rotate(45deg);
+}
+.x-mark-hover::after {
+    transform: rotate(-45deg);
+}
 .x-mark::before {
     transform: rotate(45deg);
 }
-
-.x-mark::after {
+.x-mark:after {
     transform: rotate(-45deg);
 }
