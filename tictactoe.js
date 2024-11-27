@@ -97,6 +97,12 @@
         let board = elementById.parentElement;
         lockedBoards.push(board);
         let fieldsOfBoard = Array.from(board.children);
+        let finishedBoards = getUnFinishedBoards();
+        if (finishedBoards.length === 1) {
+            console.log("Last field left");
+            //no alternative to click on.
+            return;
+        }
         for (const field of fieldsOfBoard) {
 
             field.classList.add('deactivated');
@@ -220,13 +226,21 @@
 
     };
 
+    const getUnFinishedBoards = () => {
+        let board = getElementById('board-container-main');
+        return Array.from(board.children).filter(field => field.children.length !== 2);
+    };
+
     const checkDrawCondition = (board, isOuterBoard) => {
         let children = Array.from(board.children);
         let elementsWithChildren = children.filter(field => field.children.length === 0);
-        console.log(elementsWithChildren);
         if (elementsWithChildren.length === 0 && !isOuterBoard) {
             console.log("draw");
-            board.classList.add('board-won')
+            board.classList.add('board-won');
+            const icon = document.createElement('span');
+            icon.classList.add('draw-mark');
+            board.append(icon);
+            board.parentElement.append(icon);
             for (const child of children) {
                 child.removeEventListener('click', onFieldClick);
                 child.removeEventListener('mouseenter', onFieldHover);
@@ -235,10 +249,10 @@
             return;
         }
         if (isOuterBoard) {
-            let board = getElementById('board-container-main');
-            let elementsWithChildren = Array.from(board.children).filter(field => field.children.length !== 2);
-            console.log(elementsWithChildren);
-            if (elementsWithChildren.length === 0) {
+            const finishedBoards = getUnFinishedBoards();
+            console.log(finishedBoards);
+            if (finishedBoards.length === 0) {
+                console.log('Outer board drwa');
             }
         }
     }

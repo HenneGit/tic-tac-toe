@@ -95,6 +95,18 @@ body {
     left: 0;
     transform-origin: center;
 }
+
+.draw-mark::after {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 3%;
+    background-color: #151515;
+    top: 50%;
+    left: 0;
+}
+
+
 .x-mark-hover::before,
 .x-mark-hover::after {
     content: '';
@@ -119,6 +131,10 @@ body {
 .x-mark:after {
     transform: rotate(-45deg);
 }
+.hint {
+ background: aqua;
+}
+
 
 .trap-field {
 }
