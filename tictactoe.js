@@ -175,6 +175,7 @@
         field.removeChild(field.firstChild);
         field.removeEventListener('mouseenter', onFieldHover);
         field.removeEventListener('mouseleave', removeIcon);
+        field.removeEventListener('click', onFieldClick);
         appendIcon(field, false);
 
         checkWinningCondition(id, false);
@@ -220,11 +221,17 @@
     };
 
     const checkDrawCondition = (board, isOuterBoard) => {
-        let elementsWithChildren = Array.from(board.children).filter(field => field.children.length === 0);
+        let children = Array.from(board.children);
+        let elementsWithChildren = children.filter(field => field.children.length === 0);
         console.log(elementsWithChildren);
         if (elementsWithChildren.length === 0 && !isOuterBoard) {
             console.log("draw");
             board.classList.add('board-won')
+            for (const child of children) {
+                child.removeEventListener('click', onFieldClick);
+                child.removeEventListener('mouseenter', onFieldHover);
+                child.removeEventListener('mouseleave', removeIcon);
+            }
             return;
         }
         if (isOuterBoard) {
@@ -232,7 +239,6 @@
             let elementsWithChildren = Array.from(board.children).filter(field => field.children.length !== 2);
             console.log(elementsWithChildren);
             if (elementsWithChildren.length === 0) {
-                board.classList.add('board-won');
             }
         }
     }
@@ -262,6 +268,12 @@
         icon.classList.add(player);
         board.parentElement.append(icon);
         if (gameMode === 'multi' && !isOuterBoard) {
+            let fields = Array.from(board.children);
+            for (const field of fields) {
+                field.removeEventListener('mouseenter', onFieldHover);
+                field.removeEventListener('mouseleave', removeIcon);
+                field.removeEventListener('click', onFieldClick);
+            }
             checkWinningCondition(board.parentElement.id, true);
         }
     }
