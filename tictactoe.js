@@ -11,6 +11,8 @@
         ['7', [2, 1]],
         ['8', [2, 2]]]);
 
+
+
     let player = 'circle';
     document.addEventListener('DOMContentLoaded', () => {
         setUp();
@@ -144,6 +146,23 @@
     };
 
 
+    const playWinAnimation = async (winningFields) => {
+        console.log(winningFields);
+        const pause = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+        const addClassWithDelay = async (elements) => {
+            for (const field of elements) {
+                console.log(field);
+                console.log(field.id);
+                field.firstChild.classList.add('hopping-icon');
+                await pause(100);
+            }
+            await pause(1000);
+        };
+        return addClassWithDelay(winningFields);
+
+    };
+
+
     const attachMouseOverEvents = (field) => {
         if (field.children.length > 0) {
             return;
@@ -208,17 +227,20 @@
 
     const checkWinningCondition = (id, isOuterBoard) => {
         let currentField = getElementById(id);
-        if (checkRow(id, currentField.parentElement)) {
-            boardWon(currentField.parentElement, isOuterBoard);
+        let row = checkRow(id, currentField.parentElement);
+        if (row !== null) {
+            boardWon(currentField.parentElement, isOuterBoard, row);
             return;
         }
-        if (checkColumn(id, currentField.parentElement)) {
-            boardWon(currentField.parentElement, isOuterBoard);
+        let column = checkColumn(id, currentField.parentElement);
+        if (column) {
+            boardWon(currentField.parentElement, isOuterBoard, column);
             return;
         }
         if (getFieldNumber(id) % 2 === 0) {
-            if (checkDiagonal(id, currentField.parentElement)) {
-                boardWon(currentField.parentElement, isOuterBoard);
+            let diagonal = checkDiagonals(id, currentField.parentElement);
+            if (diagonal) {
+                boardWon(currentField.parentElement, isOuterBoard, diagonal, diagonal);
                 return;
             }
         }
@@ -257,27 +279,29 @@
         }
     }
 
-    const checkDiagonal = (id, board) => {
+    const checkDiagonals = (id, board) => {
         let fieldNumber = getFieldNumber(id);
-        let isPlayerWinning = false;
+        let isPlayerWinning;
         if (fieldNumber === '0' || fieldNumber === '8') {
-            const leftToRightDiagonal = getLeftToRightDiagonal(board);
-            isPlayerWinning = fieldsContainWinning(leftToRightDiagonal);
+            isPlayerWinning = getLeftToRightDiagonal(board);
         }
         if (fieldNumber === '2' || fieldNumber === '6') {
-            const rightToLeftDiagonal = getRightToLeftDiagonal(board);
-            isPlayerWinning = fieldsContainWinning(rightToLeftDiagonal);
+            isPlayerWinning = getRightToLeftDiagonal(board);
         }
         if (fieldNumber === '4') {
-            const rightToLeftDiagonal = getRightToLeftDiagonal(board);
-            const leftToRightDiagonal = getLeftToRightDiagonal(board);
-            isPlayerWinning = fieldsContainWinning(leftToRightDiagonal) || fieldsContainWinning(rightToLeftDiagonal);
+            isPlayerWinning = getRightToLeftDiagonal(board);
+            if (!isPlayerWinning) {
+                isPlayerWinning = getLeftToRightDiagonal(board);
+
+            }
         }
         return isPlayerWinning;
     }
 
-    const boardWon = (board, isOuterBoard) => {
+    const boardWon = async (board, isOuterBoard, winningFields) => {
         const icon = document.createElement('span');
+        console.log(winningFields);
+        await playWinAnimation(winningFields);
         board.classList.add('board-won')
         icon.classList.add(player);
         board.parentElement.append(icon);
@@ -293,15 +317,23 @@
     }
 
     const getLeftToRightDiagonal = (board) => {
-        return Array.from(board.children).filter(child =>
+        let fields = Array.from(board.children).filter(child =>
             /[048]/.test(child.id[0])
         );
+        if (fieldsContainWinning(fields)) {
+            return fields;
+        }
+        return null;
     }
 
     const getRightToLeftDiagonal = (board) => {
-        return Array.from(board.children).filter(child =>
+        let fields = Array.from(board.children).filter(child =>
             /[246]/.test(child.id[0])
         );
+        if (fieldsContainWinning(fields)) {
+            return fields;
+        }
+        return null;
     }
 
     const getFieldNumber = (id) => {
@@ -311,13 +343,19 @@
     const checkRow = (id, board) => {
         const rowNumber = fieldLookUp.get(getFieldNumber(id))[0];
         const fields = board.querySelectorAll(':scope > .row' + rowNumber);
-        return fieldsContainWinning(fields);
+        if (fieldsContainWinning(fields)) {
+            return fields;
+        }
+        return null;
     };
 
     const checkColumn = (id, board) => {
         let columnNumber = fieldLookUp.get(getFieldNumber(id))[1];
         const fields = board.querySelectorAll(':scope > .column' + columnNumber);
-        return fieldsContainWinning(fields);
+        if (fieldsContainWinning(fields)) {
+            return fields;
+        }
+        return null;
     };
 
 
