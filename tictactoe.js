@@ -11,6 +11,7 @@
         ['7', [2, 1]],
         ['8', [2, 2]]]);
     let isSinglePlayer = false;
+    let isSingleGame = false;
     let player = 'circle';
     document.addEventListener('DOMContentLoaded', () => {
         setUp();
@@ -48,6 +49,7 @@
 
     const startSingleGame = () => {
         let root = getElementById('root');
+        isSingleGame = true;
         clearBoard(root);
         createBoard('main', root, 'outer-board-container', true);
 
@@ -331,7 +333,7 @@
 
     const boardWon = async (board, isOuterBoard, winningFields) => {
         const icon = document.createElement('span');
-        if (isOuterBoard) {
+        if (isOuterBoard || isSingleGame ) {
             isGlobalWin = true;
         }
         console.log(winningFields);
