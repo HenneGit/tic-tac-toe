@@ -10,17 +10,13 @@
         ['6', [2, 0]],
         ['7', [2, 1]],
         ['8', [2, 2]]]);
-
-    const globalBoards = [];
-
+    let isSinglePlayer = false;
     let player = 'circle';
     document.addEventListener('DOMContentLoaded', () => {
         setUp();
     });
-
-    const lockedBoards = [];
     let gameMode = "multi";
-
+    let isGlobalWin = false;
     const setUp = () => {
         let singleLink = getElementById('game-mode-single');
         singleLink.addEventListener('click', () => {
@@ -97,36 +93,41 @@
             await pause(1000);
         };
         return addClassWithDelay(winningFields);
-
     };
 
-    const isLockedBoard = (boardId) => {
-        for (const lockedBoard of lockedBoards) {
-            console.log(boardId === lockedBoard);
-            if (boardId === lockedBoard) {
-                return true;
+    const manageEventListeners = (isRemove) => {
+        let outerBoard = getOuterBoard();
+        let allFields = outerBoard.querySelectorAll('.field');
+        console.log(allFields);
+        if (isRemove) {
+            allFields.forEach(field => removeEventListener(field));
+        } else {
+        allFields.forEach(field => {
+            if (field.children.length === 0) {
+                attachMouseOverEvents(field);
+                field.addEventListener('click', onFieldClick);
             }
+        })
         }
-        return false;
     };
+
 
     const makeComputerMove = async () => {
         await pause(300);
         let outerBoard = getOuterBoard();
         let allColumnsRowsDiagonals = [];
         for (const board of outerBoard.children) {
-            if (isLockedBoard(board.id)) {
-                continue;
-            }
-            if (board.children.length < 2) {
+            console.log(board.children.length);
+            if (board.children.length > 0 && board.children.length !== 2) {
                 allColumnsRowsDiagonals.push(getColumnsRowsDiagonals(board.firstChild));
+            } else {
+                allColumnsRowsDiagonals.push(getColumnsRowsDiagonals(outerBoard));
             }
         }
         let possibleMoves = [];
         let ownWinningMoves = [];
-        let immediateMoves = [];
+        let immediateMoves= [];
         for (const board of allColumnsRowsDiagonals) {
-
             for (const fields of board) {
                 let fieldsWithOpponent = getFieldsWithPlayer(fields, switchPlayer());
                 let ownFields = getFieldsWithPlayer(fields, player);
@@ -140,22 +141,24 @@
                 possibleMoves.push(...getFreeFields(fields));
             }
         }
+        if (possibleMoves.length === 0 && ownWinningMoves.length === 0 && immediateMoves.length === 0) {
+            return;
+        }
         console.log(possibleMoves);
         console.log(ownWinningMoves);
         console.log(immediateMoves);
         if (ownWinningMoves.length >= 1) {
             let winningMove = ownWinningMoves[0];
-            makeMove(winningMove);
+            await makeMove(winningMove);
             return;
         }
         if (immediateMoves.length >= 1) {
             let immediateMove = immediateMoves[0];
-            makeMove(immediateMove);
+            await makeMove(immediateMove);
         } else {
             let number = Math.floor(Math.random() * possibleMoves.length);
             let possibleMove = possibleMoves[number];
-            console.log("move",possibleMove);
-            makeMove(possibleMove);
+            await makeMove(possibleMove);
         }
     };
 
@@ -163,10 +166,9 @@
         appendIcon(field, false);
         removeEventListener(field);
         await checkWinningCondition(field.id, false);
-        unlockBoard();
+        manageEventListeners(false);
         player = switchPlayer();
     };
-
 
 
     const getColumnsRowsDiagonals = (board) => {
@@ -202,7 +204,6 @@
         }
         field.addEventListener('mouseenter', onFieldHover);
         field.addEventListener('mouseleave', removeIcon);
-
     }
 
     const onFieldHover = (event) => {
@@ -224,7 +225,7 @@
     };
 
     const onFieldClick = async (event) => {
-        unlockBoard();
+        manageEventListeners(true);
         let id = event.target.id;
         if (id === "") {
             id = event.target.parentElement.id;
@@ -235,9 +236,11 @@
 
         await checkWinningCondition(id, false);
         player = switchPlayer();
-        await makeComputerMove();
+        console.log(isGlobalWin);
+        if (!isSinglePlayer && !isGlobalWin) {
+            await makeComputerMove();
+        }
     }
-
 
     const removeEventListener = (field) => {
         if (field.children.length === 2) {
@@ -247,21 +250,6 @@
         field.removeEventListener('mouseleave', removeIcon);
         field.removeEventListener('click', onFieldClick);
     };
-
-    const unlockBoard = () => {
-        let boardId = lockedBoards.shift();
-        if (boardId) {
-            const children = Array.from(getElementById(boardId).firstChild.children);
-            for (const field of children) {
-                if (!field.firstChild) {
-                    field.addEventListener('click', onFieldClick);
-                }
-                attachMouseOverEvents(field);
-                field.classList.remove('deactivated');
-            }
-        }
-    };
-
 
     const checkWinningCondition = async (id, isOuterBoard) => {
         let currentField = getElementById(id);
@@ -293,13 +281,15 @@
     const getOuterBoard = () => {
         return getElementById('board-container-main');
     }
-
     const checkDrawCondition = (board, isOuterBoard) => {
         let children = Array.from(board.children);
         let elementsWithChildren = children.filter(field => field.children.length === 0);
         if (elementsWithChildren.length === 0 && !isOuterBoard) {
-            console.log("draw");
-            addDrawIcon(board);
+            if (isOuterBoard) {
+                addDrawIcon(board.parentElement);
+            } else {
+                addDrawIcon(board);
+            }
             for (const child of children) {
                 removeEventListener(child);
             }
@@ -307,7 +297,6 @@
         }
         if (isOuterBoard) {
             const finishedBoards = getUnFinishedBoards();
-            console.log(finishedBoards);
             if (finishedBoards.length === 0) {
                 addDrawIcon(board);
             }
@@ -342,6 +331,9 @@
 
     const boardWon = async (board, isOuterBoard, winningFields) => {
         const icon = document.createElement('span');
+        if (isOuterBoard) {
+            isGlobalWin = true;
+        }
         console.log(winningFields);
         await playWinAnimation(winningFields);
         board.classList.add('board-won')
@@ -389,7 +381,7 @@
 
     const getFreeFields = (fields) => {
         return Array.from(fields).filter(field => {
-            return field.children.length === 0;
+                return field.children.length === 0;
             }
         );
     };
