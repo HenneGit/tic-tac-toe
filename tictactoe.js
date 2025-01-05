@@ -97,10 +97,9 @@
         return addClassWithDelay(winningFields);
     };
 
-    const manageEventListeners = (isRemove) => {
+    const toggleEventListeners = (isRemove) => {
         let outerBoard = getOuterBoard();
         let allFields = outerBoard.querySelectorAll('.field');
-        console.log(allFields);
         if (isRemove) {
             allFields.forEach(field => removeEventListener(field));
         } else {
@@ -119,7 +118,6 @@
         let outerBoard = getOuterBoard();
         let allColumnsRowsDiagonals = [];
         for (const board of outerBoard.children) {
-            console.log(board.children.length);
             if (board.children.length > 0 && board.children.length !== 2) {
                 allColumnsRowsDiagonals.push(getColumnsRowsDiagonals(board.firstChild));
             } else {
@@ -146,18 +144,18 @@
         if (possibleMoves.length === 0 && ownWinningMoves.length === 0 && immediateMoves.length === 0) {
             return;
         }
-        console.log(possibleMoves);
-        console.log(ownWinningMoves);
-        console.log(immediateMoves);
         if (ownWinningMoves.length >= 1) {
+            console.log("did winning move");
             let winningMove = ownWinningMoves[0];
             await makeMove(winningMove);
             return;
         }
         if (immediateMoves.length >= 1) {
+            console.log("did immediate move");
             let immediateMove = immediateMoves[0];
             await makeMove(immediateMove);
         } else {
+            console.log("did possible move");
             let number = Math.floor(Math.random() * possibleMoves.length);
             let possibleMove = possibleMoves[number];
             await makeMove(possibleMove);
@@ -168,7 +166,7 @@
         appendIcon(field, false);
         removeEventListener(field);
         await checkWinningCondition(field.id, false);
-        manageEventListeners(false);
+        toggleEventListeners(false);
         player = switchPlayer();
     };
 
@@ -180,15 +178,16 @@
         let rightToLeftDiagonal = getRightToLeftDiagonal(board);
         const diagonals = [leftToRightDiagonal, rightToLeftDiagonal];
 
-        if (isFullRowColumnDiagonal(leftToRightDiagonal)) {
+        if (!isFullRowColumnDiagonal(leftToRightDiagonal)) {
             diagonals.push(leftToRightDiagonal);
         }
-        if (isFullRowColumnDiagonal(rightToLeftDiagonal)) {
+        if (!isFullRowColumnDiagonal(rightToLeftDiagonal)) {
             diagonals.push(rightToLeftDiagonal);
         }
         for (let i = 0; i < 3; i++) {
             let row = getRow(i, board);
-            if (isFullRowColumnDiagonal(row)) {
+            if (!isFullRowColumnDiagonal(row)) {
+                console.log(row);
                 rows.push(row);
             }
             let column = getColumn(i, board);
@@ -227,18 +226,22 @@
     };
 
     const onFieldClick = async (event) => {
-        manageEventListeners(true);
+        toggleEventListeners(true);
         let id = event.target.id;
         if (id === "") {
             id = event.target.parentElement.id;
         }
         let field = getElementById(id);
+        let child = field.firstChild;
+        if (child) {
+            field.removeChild(child);
+        }
         removeEventListener(field);
+
         appendIcon(field, false);
 
         await checkWinningCondition(id, false);
         player = switchPlayer();
-        console.log(isGlobalWin);
         if (!isSinglePlayer && !isGlobalWin) {
             await makeComputerMove();
         }
@@ -336,11 +339,14 @@
         if (isOuterBoard || isSingleGame ) {
             isGlobalWin = true;
         }
-        console.log(winningFields);
         await playWinAnimation(winningFields);
         board.classList.add('board-won')
         icon.classList.add(player);
-        board.parentElement.append(icon);
+        if (isOuterBoard) {
+            board.append(icon);
+        } else {
+            board.parentElement.append(icon);
+        }
         if (gameMode === 'multi' && !isOuterBoard) {
             let fields = Array.from(board.children);
             for (const field of fields) {
@@ -393,6 +399,7 @@
                 return field.firstChild;
             }
         );
+        console.log(filter);
         return filter.length === 3;
     };
 
@@ -411,7 +418,9 @@
     };
 
     const getRow = (rowNumber, board) => {
-        return board.querySelectorAll(':scope > .row' + rowNumber);
+        let row = board.querySelectorAll(':scope > .row' + rowNumber);
+        console.log(row);
+        return row;
     };
 
     const getLeftToRightDiagonal = (board) => {
