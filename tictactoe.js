@@ -335,36 +335,28 @@
 
     const boardWon = async (board, isOuterBoard, winningFields) => {
         const icon = document.createElement('span');
+        icon.classList.add(player);
+
+
         if (isOuterBoard || isSingleGame) {
             isGlobalWin = true;
         }
-        console.log('winnningFields',winningFields);
         await playWinAnimation(winningFields, isOuterBoard);
-        if (isOuterBoard) {
-            icon.classList.add(player);
+        board.classList.add('white-background');
+        while (board.firstChild) {
+            board.removeChild(board.firstChild);
+        }
+        if (isOuterBoard || isSingleGame) {
             icon.style.position = 'relative';
-            while (board.firstChild) {
-                board.removeChild(board.firstChild);
-            }
             board.append(icon);
-            board.classList.add('white-background');
             board.classList.replace('board-container','board-container-winning')
         } else {
-            while (board.firstChild) {
-                board.removeChild(board.firstChild);
-            }
-            icon.style.position = 'relative';
-            icon.classList.add(player);
-            board.classList.add('white-background');
-            board.classList.replace('board-container','board-container-winning')
-            board.append(icon);
+            board.parentElement.append(icon);
         }
         if (gameMode === 'multi' && !isOuterBoard) {
             let fields = Array.from(board.children);
             for (const field of fields) {
-                field.removeEventListener('mouseenter', onFieldHover);
-                field.removeEventListener('mouseleave', removeIcon);
-                field.removeEventListener('click', onFieldClick);
+                removeEventListener(field);
             }
             await checkWinningCondition(board.parentElement.id, true);
         }
