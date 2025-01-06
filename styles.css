@@ -125,6 +125,13 @@ body {
     transform-origin: center;
 }
 
+.draw-mark {
+    display: block;
+    width: 80%;
+    height: 80%;
+    position: absolute;
+}
+
 .draw-mark::after {
     content: '';
     position: absolute;

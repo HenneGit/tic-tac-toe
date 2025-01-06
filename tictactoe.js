@@ -277,7 +277,7 @@
         checkDrawCondition(currentField.parentElement, isOuterBoard);
     };
 
-    const getUnFinishedBoards = () => {
+    const getFinishedBoards = () => {
         let board = getOuterBoard();
         return Array.from(board.children).filter(field => field.children.length !== 1);
     };
@@ -285,34 +285,35 @@
     const getOuterBoard = () => {
         return getElementById('board-container-main');
     }
+
     const checkDrawCondition = (board, isOuterBoard) => {
         let children = Array.from(board.children);
         let elementsWithChildren = children.filter(field => field.children.length === 0);
         if (elementsWithChildren.length === 0 && !isOuterBoard) {
             addDrawIcon(board);
-            for (const child of children) {
-                removeEventListener(child);
-            }
-            return;
         }
-        if (isOuterBoard) {
-            const finishedBoards = getUnFinishedBoards();
-            console.log(finishedBoards)
-            if (finishedBoards.length === 9) {
-                addDrawIcon(board.parentElement);
-            }
+        const finishedBoards = getFinishedBoards();
+        console.log(finishedBoards);
+        if (finishedBoards.length === 9) {
+            isGlobalWin = true;
+            addDrawIcon(board, isOuterBoard);
         }
     }
 
-    const addDrawIcon = (board) => {
+    const addDrawIcon = (board, isOuterBord) => {
         while (board.firstChild) {
             board.removeChild(board.firstChild);
         }
-        board.classList.add('board-won');
+        board.classList.add('white-background');
         const icon = document.createElement('span');
         icon.classList.add('draw-mark');
-        board.append(icon);
-        board.parentElement.append(icon);
+        board.classList.replace('board-container', 'board-container-winning');
+        if (isOuterBord || isSingleGame) {
+            icon.style.position = 'relative';
+            board.append(icon);
+        } else {
+            board.parentElement.append(icon);
+        }
     };
 
     const checkDiagonals = (id, board) => {
@@ -349,15 +350,12 @@
         if (isOuterBoard || isSingleGame) {
             icon.style.position = 'relative';
             board.append(icon);
-            board.classList.replace('board-container','board-container-winning')
+            board.classList.replace('board-container', 'board-container-winning')
         } else {
             board.parentElement.append(icon);
         }
         if (gameMode === 'multi' && !isOuterBoard) {
             let fields = Array.from(board.children);
-            for (const field of fields) {
-                removeEventListener(field);
-            }
             await checkWinningCondition(board.parentElement.id, true);
         }
     }
@@ -422,7 +420,6 @@
 
     const getRow = (rowNumber, board) => {
         return board.querySelectorAll(':scope > .row' + rowNumber);
-
     };
 
     const getLeftToRightDiagonal = (board) => {
