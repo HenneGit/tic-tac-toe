@@ -35,6 +35,20 @@ body {
     background-color: black;
 }
 
+.board-container-winning {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.circle-winning {
+    width: 90%;
+    height: 90%;
+    border-radius: 50%;
+    border: 2px solid black;
+}
+
+
 .inner-board-container {
     background-color: lightgrey;
     margin: 5%;
@@ -42,9 +56,10 @@ body {
     height: clamp(50px, 90%, 500px);
 }
 
-.board-won {
-    opacity: 0.1;
+.white-background {
+    background-color: white;
 }
+
 
 .field {
     background: white;

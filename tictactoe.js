@@ -10,9 +10,10 @@
         ['6', [2, 0]],
         ['7', [2, 1]],
         ['8', [2, 2]]]);
+
     let isSinglePlayer = false;
     let isSingleGame = false;
-    let player = 'circle';
+    let player = 'x-mark';
     document.addEventListener('DOMContentLoaded', () => {
         setUp();
     });
@@ -86,10 +87,14 @@
 
     const pause = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
-    const playWinAnimation = async (winningFields) => {
+    const playWinAnimation = async (winningFields, isOuterBoard) => {
         const addClassWithDelay = async (elements) => {
             for (const field of elements) {
-                field.firstChild.classList.add('hopping-icon');
+                if (isOuterBoard) {
+                    field.children[1].classList.add('hopping-icon');
+                } else {
+                    field.firstChild.classList.add('hopping-icon');
+                }
                 await pause(100);
             }
             await pause(1000);
@@ -103,12 +108,12 @@
         if (isRemove) {
             allFields.forEach(field => removeEventListener(field));
         } else {
-        allFields.forEach(field => {
-            if (field.children.length === 0) {
-                attachMouseOverEvents(field);
-                field.addEventListener('click', onFieldClick);
-            }
-        })
+            allFields.forEach(field => {
+                if (field.children.length === 0) {
+                    attachMouseOverEvents(field);
+                    field.addEventListener('click', onFieldClick);
+                }
+            })
         }
     };
 
@@ -126,7 +131,7 @@
         }
         let possibleMoves = [];
         let ownWinningMoves = [];
-        let immediateMoves= [];
+        let immediateMoves = [];
         for (const board of allColumnsRowsDiagonals) {
             for (const fields of board) {
                 let fieldsWithOpponent = getFieldsWithPlayer(fields, switchPlayer());
@@ -187,7 +192,6 @@
         for (let i = 0; i < 3; i++) {
             let row = getRow(i, board);
             if (!isFullRowColumnDiagonal(row)) {
-                console.log(row);
                 rows.push(row);
             }
             let column = getColumn(i, board);
@@ -237,9 +241,7 @@
             field.removeChild(child);
         }
         removeEventListener(field);
-
         appendIcon(field, false);
-
         await checkWinningCondition(id, false);
         player = switchPlayer();
         if (!isSinglePlayer && !isGlobalWin) {
@@ -248,9 +250,6 @@
     }
 
     const removeEventListener = (field) => {
-        if (field.children.length === 2) {
-            field.removeChild(field.firstChild);
-        }
         field.removeEventListener('mouseenter', onFieldHover);
         field.removeEventListener('mouseleave', removeIcon);
         field.removeEventListener('click', onFieldClick);
@@ -280,7 +279,7 @@
 
     const getUnFinishedBoards = () => {
         let board = getOuterBoard();
-        return Array.from(board.children).filter(field => field.children.length !== 2);
+        return Array.from(board.children).filter(field => field.children.length !== 1);
     };
 
     const getOuterBoard = () => {
@@ -290,11 +289,7 @@
         let children = Array.from(board.children);
         let elementsWithChildren = children.filter(field => field.children.length === 0);
         if (elementsWithChildren.length === 0 && !isOuterBoard) {
-            if (isOuterBoard) {
-                addDrawIcon(board.parentElement);
-            } else {
-                addDrawIcon(board);
-            }
+            addDrawIcon(board);
             for (const child of children) {
                 removeEventListener(child);
             }
@@ -302,13 +297,17 @@
         }
         if (isOuterBoard) {
             const finishedBoards = getUnFinishedBoards();
-            if (finishedBoards.length === 0) {
-                addDrawIcon(board);
+            console.log(finishedBoards)
+            if (finishedBoards.length === 9) {
+                addDrawIcon(board.parentElement);
             }
         }
     }
 
     const addDrawIcon = (board) => {
+        while (board.firstChild) {
+            board.removeChild(board.firstChild);
+        }
         board.classList.add('board-won');
         const icon = document.createElement('span');
         icon.classList.add('draw-mark');
@@ -336,16 +335,29 @@
 
     const boardWon = async (board, isOuterBoard, winningFields) => {
         const icon = document.createElement('span');
-        if (isOuterBoard || isSingleGame ) {
+        if (isOuterBoard || isSingleGame) {
             isGlobalWin = true;
         }
-        await playWinAnimation(winningFields);
-        board.classList.add('board-won')
-        icon.classList.add(player);
+        console.log('winnningFields',winningFields);
+        await playWinAnimation(winningFields, isOuterBoard);
         if (isOuterBoard) {
+            icon.classList.add(player);
+            icon.style.position = 'relative';
+            while (board.firstChild) {
+                board.removeChild(board.firstChild);
+            }
             board.append(icon);
+            board.classList.add('white-background');
+            board.classList.replace('board-container','board-container-winning')
         } else {
-            board.parentElement.append(icon);
+            while (board.firstChild) {
+                board.removeChild(board.firstChild);
+            }
+            icon.style.position = 'relative';
+            icon.classList.add(player);
+            board.classList.add('white-background');
+            board.classList.replace('board-container','board-container-winning')
+            board.append(icon);
         }
         if (gameMode === 'multi' && !isOuterBoard) {
             let fields = Array.from(board.children);
@@ -399,7 +411,6 @@
                 return field.firstChild;
             }
         );
-        console.log(filter);
         return filter.length === 3;
     };
 
@@ -418,9 +429,8 @@
     };
 
     const getRow = (rowNumber, board) => {
-        let row = board.querySelectorAll(':scope > .row' + rowNumber);
-        console.log(row);
-        return row;
+        return board.querySelectorAll(':scope > .row' + rowNumber);
+
     };
 
     const getLeftToRightDiagonal = (board) => {
