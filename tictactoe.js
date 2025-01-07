@@ -11,31 +11,80 @@
         ['7', [2, 1]],
         ['8', [2, 2]]]);
 
-    let isSinglePlayer = false;
+    let isVersusComputer = false;
     let isSingleGame = false;
     let player = 'x-mark';
-    document.addEventListener('DOMContentLoaded', () => {
-        setUp();
-    });
     let gameMode = "multi";
     let isGlobalWin = false;
-    const setUp = () => {
-        let singleLink = getElementById('game-mode-single');
-        singleLink.addEventListener('click', () => {
-            gameMode = 'single';
+    const modal = document.querySelector("#modal");
+    const play = document.querySelector("#new-game");
+    const vsComputer = document.querySelector("#vs-computer");
+    const vsHuman = document.querySelector("#vs-human");
+    const playerXmark = document.querySelector("#player-x-mark");
+    const playerCircle = document.querySelector("#player-circle");
+    const singleLink = document.querySelector("#game-mode-single");
+    const multiLink = document.querySelector("#game-mode-multi");
+    const startGame = document.querySelector("#start-game");
+    const cancel = document.querySelector("#cancel");
+
+    play.addEventListener("click", () => {
+        console.log("Hallo");
+        reset();
+        modal.showModal();
+    });
+    vsComputer.addEventListener("click", () => {
+        isVersusComputer = true;
+        vsComputer.classList.add('selected-option');
+        vsHuman.classList.remove('selected-option');
+    });
+    vsHuman.addEventListener("click", () => {
+        isVersusComputer = false;
+        vsHuman.classList.add('selected-option');
+        vsComputer.classList.remove('selected-option');
+    });
+    playerXmark.addEventListener("click", () => {
+        player = "x-mark";
+        playerXmark.classList.add('selected-option');
+        playerCircle.classList.remove('selected-option');
+    });
+    playerCircle.addEventListener("click", () => {
+        player = "circle";
+        playerCircle.classList.add('selected-option');
+        playerXmark.classList.remove('selected-option');
+    });
+    singleLink.addEventListener('click', () => {
+        gameMode = 'single';
+        singleLink.classList.add('selected-option');
+        multiLink.classList.remove('selected-option');
+    })
+    multiLink.addEventListener('click', () => {
+        gameMode = 'multi';
+        multiLink.classList.add('selected-option');
+        singleLink.classList.remove('selected-option');
+    })
+    startGame.addEventListener('click', () => {
+        if (gameMode === 'single') {
             startSingleGame();
-        })
-        let multiLink = getElementById('game-mode-multi');
-        multiLink.addEventListener('click', () => {
-            gameMode = 'multi';
+        }
+        if (gameMode === 'multi') {
             startMultiFieldGame();
-        })
-    };
+        }
+        modal.close();
+    })
+    cancel.addEventListener('click', () => {
+        modal.close();
+    })
+
+
     const clearBoard = (root) => {
         let board = getOuterBoard();
         if (board) {
             root.removeChild(board);
         }
+    };
+
+    const reset = () => {
+        isGlobalWin = false;
     };
 
     const startMultiFieldGame = () => {
@@ -53,7 +102,6 @@
         isSingleGame = true;
         clearBoard(root);
         createBoard('main', root, 'outer-board-container', true);
-
     };
 
     const switchPlayer = () => {
@@ -220,7 +268,6 @@
         let cssClass = isHover ? player + '-hover' : player;
         icon.classList.add(cssClass);
         field.append(icon);
-
     };
 
     const removeIcon = (event) => {
@@ -244,8 +291,10 @@
         appendIcon(field, false);
         await checkWinningCondition(id, false);
         player = switchPlayer();
-        if (!isSinglePlayer && !isGlobalWin) {
+        if (!isVersusComputer && !isGlobalWin) {
             await makeComputerMove();
+        } else {
+            toggleEventListeners(false)
         }
     }
 
@@ -293,7 +342,6 @@
             addDrawIcon(board);
         }
         const finishedBoards = getFinishedBoards();
-        console.log(finishedBoards);
         if (finishedBoards.length === 9) {
             isGlobalWin = true;
             addDrawIcon(board, isOuterBoard);

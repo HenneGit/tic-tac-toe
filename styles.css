@@ -6,10 +6,15 @@ body {
 .root {
     margin: 0 auto;
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
     height: 100vh;
     width: 100vw;
+}
+
+.menu-container {
+    margin-bottom: 3em;
 }
 
 .menu-item-container {
@@ -17,14 +22,54 @@ body {
     display: flex;
     gap: 1em;
 }
+
 .game-mode {
     cursor: pointer;
 }
 
+.player-container {
+
+}
+
+.options-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 100%;
+    width: 100%;
+}
+
+.option-container {
+    display: flex;
+    flex-direction: row;
+    height: 100%;
+    width: 100%;
+    gap: 1em;
+    padding: 1em;
+    align-items: center;
+    justify-content: center;
+
+}
+
+.player-option {
+    height: 4em;
+    width: 4em;
+}
+
+.modal {
+    padding: 4em;
+    border: unset;
+    box-shadow: 0 0 1em rgb(0 0 0 / .3);
+    & > * {
+        margin: 0 0 0.5rem 0;
+    }
+}
+
+
 .outer-board-container {
     width: clamp(500px, 60vh, 1500px);
     height: clamp(500px, 60vh, 1500px);
-    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 .board-container {
@@ -77,7 +122,7 @@ body {
 }
 
 
-.circle{
+.circle {
     width: 80%;
     height: 80%;
     border-radius: 50%;
@@ -94,6 +139,11 @@ body {
 
 .hopping-icon {
     animation: hop 0.6s ease-in-out;
+}
+
+.selected-option {
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.2);
+    background-color: #ece6e6;
 }
 
 @keyframes hop {
@@ -157,12 +207,15 @@ body {
 .x-mark-hover::before {
     transform: rotate(45deg);
 }
+
 .x-mark-hover::after {
     transform: rotate(-45deg);
 }
+
 .x-mark::before {
     transform: rotate(45deg);
 }
+
 .x-mark:after {
     transform: rotate(-45deg);
 }
