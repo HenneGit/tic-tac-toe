@@ -30,6 +30,7 @@ body {
 
 .game-mode {
     cursor: pointer;
+    font-size: 12px;
 }
 
 .player-container {
