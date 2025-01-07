@@ -23,9 +23,9 @@ body {
 }
 
 .menu-item-container {
-    margin-right: 2em;
     display: flex;
     gap: 1em;
+    margin-bottom: 1em;
 }
 
 .game-mode {
