@@ -17,6 +17,9 @@ body {
 
 .menu-container {
     margin-bottom: 3em;
+    position: fixed;
+    top: 100px;
+    right:20px;
 }
 
 .menu-item-container {

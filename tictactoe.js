@@ -215,17 +215,14 @@
             return;
         }
         if (ownWinningMoves.length >= 1) {
-            console.log("did winning move");
             let winningMove = ownWinningMoves[0];
             await makeMove(winningMove);
             return;
         }
         if (immediateMoves.length >= 1) {
-            console.log("did immediate move");
             let immediateMove = immediateMoves[0];
             await makeMove(immediateMove);
         } else {
-            console.log("did possible move");
             let number = Math.floor(Math.random() * possibleMoves.length);
             let possibleMove = possibleMoves[number];
             await makeMove(possibleMove);
@@ -361,7 +358,7 @@
         const finishedBoards = getFinishedBoards();
         if (finishedBoards.length === 9) {
             isGlobalWin = true;
-            addDrawIcon(board, isOuterBoard);
+            addDrawIcon(getOuterBoard(), true);
         }
     }
 
