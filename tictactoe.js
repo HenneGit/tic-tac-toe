@@ -81,19 +81,18 @@
         startGame();
     })
 
-
     const startGame = () => {
         if (playerPicked && iconPicked) {
             if (gameMode === 'single') {
                 startSingleGame();
+                modal.close();
             }
             if (gameMode === 'multi') {
                 startMultiFieldGame();
+                modal.close();
             }
-            modal.close();
         }
     };
-
 
     const clearBoard = (root) => {
         let board = getOuterBoard();
@@ -183,7 +182,6 @@
             })
         }
     };
-
 
     const makeComputerMove = async () => {
         await pause(300);
@@ -404,8 +402,6 @@
     const boardWon = async (board, isOuterBoard, winningFields) => {
         const icon = document.createElement('span');
         icon.classList.add(player);
-
-
         if (isOuterBoard || isSingleGame) {
             isGlobalWin = true;
         }
@@ -422,7 +418,6 @@
             board.parentElement.append(icon);
         }
         if (gameMode === 'multi' && !isOuterBoard) {
-            let fields = Array.from(board.children);
             await checkWinningCondition(board.parentElement.id, true);
         }
     }
