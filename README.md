@@ -1,8 +1,8 @@
 # TIC TAC TOE
-A tic tac toe game with a twist. Play against the computer or a friend. Made as an exercise for Vanilla JavaScript and CSS.
+A tic tac toe game with a twist. Play against the computer or a friend. Made as an exercise for training vanilla JavaScript and CSS.
 
 # How to play
- Click on play and pic game mode, your icon and if you want to play against the computer or a friend:
+ Click on play and pick game mode, your icon and if you want to play against the computer or a friend:
 
 ![alt text](./screenshots/options.png "Tic Tac Toe - Options")
 
