@@ -1,5 +1,7 @@
 body {
     font-family: Arial, Helvetica, sans-serif;
+    margin: 0;
+    padding: 0;
 }
 
 
@@ -58,13 +60,44 @@ body {
 
 .modal {
     padding: 4em;
-    border: unset;
+    width: 20em;
     box-shadow: 0 0 1em rgb(0 0 0 / .3);
+    border: none;
     & > * {
         margin: 0 0 0.5rem 0;
     }
 }
 
+.modal:focus {
+    outline: none;
+}
+
+.close-button {
+    position: absolute;
+    top: .4em;
+    right: .5em;
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: #333;
+    font-weight: bold;
+    z-index: 1;
+}
+
+.close-button::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -54%);
+    width: 1.5em;
+    height: 1.5em;
+    background-color: #ffffff;
+    border-radius: 50%;
+    z-index: -1;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
 
 .outer-board-container {
     width: clamp(500px, 60vh, 1500px);

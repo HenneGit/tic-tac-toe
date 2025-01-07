@@ -14,8 +14,10 @@
     let isVersusComputer = false;
     let isSingleGame = false;
     let player = 'x-mark';
-    let gameMode = "multi";
+    let gameMode = "";
     let isGlobalWin = false;
+    let playerPicked = false;
+    let iconPicked = false;
     const modal = document.querySelector("#modal");
     const play = document.querySelector("#new-game");
     const vsComputer = document.querySelector("#vs-computer");
@@ -24,56 +26,73 @@
     const playerCircle = document.querySelector("#player-circle");
     const singleLink = document.querySelector("#game-mode-single");
     const multiLink = document.querySelector("#game-mode-multi");
-    const startGame = document.querySelector("#start-game");
-    const cancel = document.querySelector("#cancel");
+    const close = document.querySelector(".close-button");
+
+    close.addEventListener("click", () => {
+        modal.close();
+    });
 
     play.addEventListener("click", () => {
-        console.log("Hallo");
         reset();
         modal.showModal();
     });
     vsComputer.addEventListener("click", () => {
         isVersusComputer = true;
+        playerPicked = true
         vsComputer.classList.add('selected-option');
         vsHuman.classList.remove('selected-option');
+        startGame();
     });
     vsHuman.addEventListener("click", () => {
         isVersusComputer = false;
+        playerPicked = true
         vsHuman.classList.add('selected-option');
         vsComputer.classList.remove('selected-option');
+        startGame();
+
     });
     playerXmark.addEventListener("click", () => {
         player = "x-mark";
+        iconPicked = true;
         playerXmark.classList.add('selected-option');
         playerCircle.classList.remove('selected-option');
+        startGame();
+
     });
     playerCircle.addEventListener("click", () => {
         player = "circle";
+        iconPicked = true;
         playerCircle.classList.add('selected-option');
         playerXmark.classList.remove('selected-option');
+        startGame();
+
     });
     singleLink.addEventListener('click', () => {
         gameMode = 'single';
         singleLink.classList.add('selected-option');
         multiLink.classList.remove('selected-option');
+        startGame();
+
     })
     multiLink.addEventListener('click', () => {
         gameMode = 'multi';
         multiLink.classList.add('selected-option');
         singleLink.classList.remove('selected-option');
+        startGame();
     })
-    startGame.addEventListener('click', () => {
-        if (gameMode === 'single') {
-            startSingleGame();
+
+
+    const startGame = () => {
+        if (playerPicked && iconPicked) {
+            if (gameMode === 'single') {
+                startSingleGame();
+            }
+            if (gameMode === 'multi') {
+                startMultiFieldGame();
+            }
+            modal.close();
         }
-        if (gameMode === 'multi') {
-            startMultiFieldGame();
-        }
-        modal.close();
-    })
-    cancel.addEventListener('click', () => {
-        modal.close();
-    })
+    };
 
 
     const clearBoard = (root) => {
@@ -291,7 +310,7 @@
         appendIcon(field, false);
         await checkWinningCondition(id, false);
         player = switchPlayer();
-        if (!isVersusComputer && !isGlobalWin) {
+        if (isVersusComputer && !isGlobalWin) {
             await makeComputerMove();
         } else {
             toggleEventListeners(false)
